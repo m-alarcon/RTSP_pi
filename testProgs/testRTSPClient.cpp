@@ -19,7 +19,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // NOTE: This code - although it builds a running application - is intended only to illustrate how to develop your own RTSP
 // client application.  For a full-featured RTSP client application - with much more functionality, and many options - see
 // "openRTSP": http://www.live555.com/openRTSP/
-
+#include <io.h>
+#include <fcntl.h>
 #include "liveMedia.hh"
 #include "BasicUsageEnvironment.hh"
 
@@ -498,7 +499,7 @@ void DummySink::afterGettingFrame(void* clientData, unsigned frameSize, unsigned
 }
 
 // If you don't want to see debugging output for each received frame, then comment out the following line:
-#define DEBUG_PRINT_EACH_RECEIVED_FRAME 1
+//#define DEBUG_PRINT_EACH_RECEIVED_FRAME 1
 
 void DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes,
 				  struct timeval presentationTime, unsigned /*durationInMicroseconds*/) {
@@ -518,8 +519,11 @@ void DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes
 #endif
   envir() << "\n";
 #endif
-  
-  fwrite(fReceiveBuffer, sizeof(uint8_t), frameSize, stdout);
+
+  _setmode( _fileno( stdout ), _O_BINARY ); 
+  const char header[4] = {0x00, 0x00, 0x00, 0x01};
+  fwrite(header, sizeof(char), sizeof(header)/ sizeof(header[0]), stdout); 
+  fwrite(fReceiveBuffer, sizeof(char), frameSize, stdout);
   fflush(stdout);
 
 
