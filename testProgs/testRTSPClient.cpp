@@ -19,7 +19,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // NOTE: This code - although it builds a running application - is intended only to illustrate how to develop your own RTSP
 // client application.  For a full-featured RTSP client application - with much more functionality, and many options - see
 // "openRTSP": http://www.live555.com/openRTSP/
-#include <io.h>
+  #ifdef _WIN32
+    #include <io.h>
+  #endif
 #include <fcntl.h>
 #include "liveMedia.hh"
 #include "BasicUsageEnvironment.hh"
@@ -519,8 +521,9 @@ void DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes
 #endif
   envir() << "\n";
 #endif
-
-  _setmode( _fileno( stdout ), _O_BINARY ); 
+  #ifdef _WIN32
+    _setmode( _fileno( stdout ), _O_BINARY ); 
+  #endif
   const char header[4] = {0x00, 0x00, 0x00, 0x01};
   fwrite(header, sizeof(char), sizeof(header)/ sizeof(header[0]), stdout); 
   fwrite(fReceiveBuffer, sizeof(char), frameSize, stdout);
